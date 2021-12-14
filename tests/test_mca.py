@@ -56,6 +56,13 @@ class TestMCA(unittest.TestCase):
         ax = mca.plot_coordinates(self.X, show_column_labels=True)
         self.assertTrue(isinstance(ax, mpl.axes.Axes))
 
+    def test_plot_with_suppl(self):
+        mca = prince.MCA(n_components=4, random_state=42)
+        mca.fit(self.X)
+        X_with_suppl = pd.get_dummies(self.X.assign(oak_type=self.oak_col_suppl)).append(self.wine_row_suppl)
+        ax = mca.plot_coordinates(X_with_suppl)
+        self.assertTrue(isinstance(ax, mpl.axes.Axes))
+
     def test_fit_with_K(self):
         mca = prince.MCA(n_components=2, random_state=42)
         mca.fit(pd.get_dummies(self.X), K=10)
@@ -86,7 +93,7 @@ class TestMCA(unittest.TestCase):
     def test_column_coordinates_suppl(self):
         mca = prince.MCA(n_components=4, random_state=42)
         mca.fit(self.X)
-        coords = mca.column_coordinates(self.oak_col_suppl)
+        coords = mca.column_coordinates(pd.DataFrame(self.oak_col_suppl))
         self.assertEquals(4, len(coords.columns))
         self.assertEquals(2, len(coords.index))
 

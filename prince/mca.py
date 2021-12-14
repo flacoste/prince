@@ -146,8 +146,7 @@ class MCA(ca.CA):
 
         # Plot row principal coordinates
         if show_row_points or show_row_labels:
-
-            row_coords = self.row_coordinates(X)
+            row_coords = self.row_coordinates(X.loc[:, self.col_masses_.index])
 
             if show_row_points:
                 ax.scatter(
@@ -166,7 +165,7 @@ class MCA(ca.CA):
         # Plot column principal coordinates
         if show_column_points or show_column_labels:
 
-            col_coords = self.column_coordinates(X)
+            col_coords = self.column_coordinates(X.loc[self.row_masses_.index,:])
             x = col_coords[x_component]
             y = col_coords[y_component]
 
