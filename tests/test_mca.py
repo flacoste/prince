@@ -25,8 +25,14 @@ class TestMCA(unittest.TestCase):
             columns=['E1 fruity', 'E1 woody', 'E1 coffee',
                      'E2 red fruit', 'E2 roasted', 'E2 vanillin', 'E2 woody',
                      'E3 fruity', 'E3 butter', 'E3 woody'],
-            index=[1, 2, 3, 4, 5, 6]
+            index=["W1", "W2", "W3", "W4", "W5", "W6"]
         )
+        self.oak_col_suppl = pd.Series(["1", "2", "2", "2", "1", "1"], index=self.X.index, name="Oak Type")
+
+        # Coding directly because of the .5 values
+        self.wine_row_suppl = pd.Series([0, 1, 0, 1, 0, .5, .5, 1, 0, 1, 0, 1, 0, 0, .5, .5, 1, 0, .5, .5, 0, 1],
+                                         index=pd.get_dummies(self.X).columns, name="W?")
+
 
     def test_pandas_dataframe(self):
         mca = prince.MCA(n_components=2)
@@ -72,6 +78,30 @@ class TestMCA(unittest.TestCase):
         self.assertEquals(mca.J, 22)
         np.testing.assert_allclose(mca.explained_inertia_, [.9519, .0168, .0004, 0 ], atol=0.0001)
 
+    def test_column_coordinates_no_args(self):
+        mca = prince.MCA(n_components=4, random_state=42)
+        mca.fit(self.X)
+        pd.testing.assert_frame_equal(mca.column_coordinates(), mca.column_coordinates(self.X))
+
+    def test_column_coordinates_suppl(self):
+        mca = prince.MCA(n_components=4, random_state=42)
+        mca.fit(self.X)
+        coords = mca.column_coordinates(self.oak_col_suppl)
+        self.assertEquals(4, len(coords.columns))
+        self.assertEquals(2, len(coords.index))
+
+    def test_row_coords_no_args(self):
+        mca = prince.MCA(n_components=4, random_state=42)
+        mca.fit(self.X)
+        pd.testing.assert_frame_equal(mca.row_coordinates(), mca.row_coordinates(self.X))
+
+    def test_row_coordinates_suppl(self):
+        mca = prince.MCA(n_components=4, random_state=42)
+        mca.fit(self.X)
+        coords = mca.row_coordinates(pd.DataFrame(self.wine_row_suppl).T)
+        self.assertEquals(4, len(coords.columns))
+        self.assertEquals(1, len(coords.index))
+
     def test_row_contributions(self):
         mca = prince.MCA(n_components=4, random_state=42)
         mca.fit(self.X)
@@ -103,4 +133,5 @@ class TestMCA(unittest.TestCase):
         pd.testing.assert_index_equal(c_cos2.index, mca.col_masses_.index)
         self.assert_(np.all((c_cos2 >= 0) & (c_cos2 <= 1)), "All Cos2 should be between 0 and 1")
         # Should be really <= 1., but account for floating precision error
-        self.assert_(np.all(c_cos2.sum(axis=1) <= 1.000001), "Cos2 across dimensions should be near 1")
+        self.assert_(np.all(c_cos2.sum(axis=1) <= 1.000001), "Cos2 across dimensions should be near 1")       
+        

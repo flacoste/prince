@@ -109,9 +109,16 @@ class CA(base.BaseEstimator, base.TransformerMixin):
                             index=self.col_masses_.index, columns=pd.RangeIndex(0, len(self.s_)))
 
 
-    def row_coordinates(self, X):
-        """The row principal coordinates."""
+    def row_coordinates(self, X=None):
+        """Return the coordinates of row points on the principal components.
+        
+        Without parameters, return the coordinates from the fitted data (same than the F property).
+        With a parameter, compute the scores as supplementary rows. The number of columns must match the fitted data.
+        """
         self._check_is_fitted()
+
+        if X is None:
+            return self.F
 
         _, row_names, _, _ = util.make_labels_and_names(X)
 
@@ -135,9 +142,16 @@ class CA(base.BaseEstimator, base.TransformerMixin):
             index=row_names
         )
 
-    def column_coordinates(self, X):
-        """The column principal coordinates."""
+    def column_coordinates(self, X=None):
+        """Return the coordinates of column points on the principal coordinates.
+        
+        Without parameters, return the coordinates from the fitted data (same than the G property).
+        With a parameter, compute the scores as supplementary columns. The number of rows must match the fitted data.
+        """
         self._check_is_fitted()
+
+        if X is None:
+            return self.G
 
         _, _, _, col_names = util.make_labels_and_names(X)
 

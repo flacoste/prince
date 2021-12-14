@@ -80,12 +80,26 @@ class MCA(ca.CA):
 
         return self.eigenvalues_ / Theta
 
-    def row_coordinates(self, X):
+    def row_coordinates(self, X=None):
+        """Return the coordinates of row points on the principal components.
+        
+        Without parameters, return the coordinates from the fitted data (same than the F property).
+        With a parameter, compute the scores as supplementary rows. The number of columns must match the fitted data.
+        """
+        if X is None:
+            return self.F
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
         return super().row_coordinates(pd.get_dummies(X))
 
-    def column_coordinates(self, X):
+    def column_coordinates(self, X=None):
+        """Return the coordinates of column points on the principal coordinates.
+        
+        Without parameters, return the coordinates from the fitted data (same than the G property).
+        With a parameter, compute the scores as supplementary columns. The number of rows must match the fitted data.
+        """
+        if X is None:
+            return self.G
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
         return super().column_coordinates(pd.get_dummies(X))
